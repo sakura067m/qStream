@@ -16,7 +16,7 @@ setup(
     packages=["qStream"],
     package_dir={"qStream": "qStream"},
     package_data={
-        "qStream"=[]
+        "qStream":[]
     },
     entry_points={
         "gui_scripts": ["qStream = qStream.__main__:RTMStreamer.go"]
