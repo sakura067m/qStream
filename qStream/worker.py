@@ -24,7 +24,7 @@ def logRTM(token, stop_event, config):
     # setup slack client
     sc = SlackClient(token)
 
-    if sc.rtm_connect():
+    if sc.rtm_connect(auto_reconnect=True):
         while not stop_event.is_set() and sc.server.connected is True:
             rtm_response = sc.rtm_read()
             for message in rtm_response:
@@ -36,6 +36,9 @@ def logRTM(token, stop_event, config):
                 else:
                     pass
             time.sleep(1)
-        print("closing")
+##        print("closing")
     else:
         print("Connection Failed")
+
+if __name__ == "__main__":
+    pass
