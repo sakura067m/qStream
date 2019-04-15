@@ -58,7 +58,6 @@ class RTMstreamer(MainWindow):
         self.stop_event.set()
         self.stream.join()
         self.stream.terminate()
-        print(self.stream.is_alive())
 
     @classmethod
     def go(cls, style=default_style):
