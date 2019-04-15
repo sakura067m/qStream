@@ -2,7 +2,6 @@ from . import *
 import os
 import sys
 
-import logging.config
 import logging.handlers
 
 from multiprocessing import Process, Queue, Event
@@ -13,7 +12,7 @@ from PyQt5.QtCore import pyqtSignal
 class RTMstreamer(MainWindow):
 
     startSig = pyqtSignal()
-    
+
     def dispatch(self, app):
         # to quit
         app.aboutToQuit.connect(self.on_quit)
@@ -22,7 +21,7 @@ class RTMstreamer(MainWindow):
         self.stop_event = Event()
         config_worker = {
             'version': 1,
-            'disable_existing_loggers': True,
+            # 'disable_existing_loggers': True,
             'handlers': {
                 'queue': {
                     'class': 'logging.handlers.QueueHandler',
@@ -53,14 +52,14 @@ class RTMstreamer(MainWindow):
                               )
         # start
         self.stream.start()
-        
+
     def on_quit(self):
 ##        self.stream.disconnect()
         self.stop_event.set()
         self.stream.join()
         self.stream.terminate()
         print(self.stream.is_alive())
-        
+
     @classmethod
     def go(cls, style=default_style):
         app = QApplication(sys.argv)
@@ -74,4 +73,8 @@ class RTMstreamer(MainWindow):
 
 
 if __name__ == "__main__":
+    print("poo")
+    if "darwin" == sys.platform:
+        import multiprocessing as mp
+        mp.set_start_method("spawn")
     RTMstreamer.go()

@@ -54,8 +54,8 @@ class Mine(QWidget):
         align.addSpacing(20)
         align.addStretch(0)
         align.addWidget(self.text)
-            
-        
+
+
 class Other(QWidget):
     def __init__(self, text, parent=None):
         super().__init__(parent)
@@ -122,11 +122,11 @@ class ShowHistory(QScrollArea):
         vSB = self.verticalScrollBar()
         self.vSB = vSB
         vSB.rangeChanged.connect(self.scroll_to_bottom)
-        
+
     def i_said(self, text):
         chat = Mine(text,self.base)
         self.scroll_layout.addWidget(chat)
-        
+
     def they_said(self, text):
         chat = Other(text,self.base)
         self.scroll_layout.addWidget(chat)
@@ -156,7 +156,7 @@ class MainWindow(QMainWindow):
         self.t_mode = False
         self._ontop = False
         self.initUI()
-        
+
 
     def initUI(self):
         self.setWindowTitle("Main Window")
@@ -211,7 +211,7 @@ class MainWindow(QMainWindow):
         sw_s.setChecked(self._ontop)
         sw_s.toggled.connect(self.sw_ontop)
         close = cmenu.addAction("close")
-        
+
         action = cmenu.exec_(self.mapToGlobal(event.pos()))
 ##        if action == sw_t:
 ##            self.sw_transparent()
@@ -233,16 +233,9 @@ class MainWindow(QMainWindow):
         self.history.i_said(text)
     def addChat2(self, text):
         self.history.they_said(text)
-            
-        
+
+
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    app.setStyleSheet(default_style)
-    ex = MainWindow()
-    ex.show()
-    choice = (ex.addChat2, ex.addChat1)
-    for k in range(100):
-        choice[k&1]("test{:0>2}".format(k))
-    sys.exit(app.exec_())
+    pass
