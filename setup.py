@@ -31,6 +31,7 @@ setup(
         "gui_scripts": ["qStream = qStream.__main__:RTMStreamer.go"]
     },
     install_requires=requirements,
+    python_requires='>=3.4',
     keywords="muxing classroom",
     classifiers=[
         "Development Status :: 3 - Alpha",
