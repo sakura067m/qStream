@@ -9,7 +9,7 @@ if "darwin" == platform.system().lower():
     ]
 else:
     requirements = [
-        "slackclient>=1.3.1",
+        "slackclient>=2.0.1",
         "PyQt5>=5.8.2",  # TBD
     ]
 
