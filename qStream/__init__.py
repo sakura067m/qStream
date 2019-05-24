@@ -1,11 +1,11 @@
 import sys
 
-from .views import MainWindow, default_style
+from qChatView import MainWindow, default_style
 # start import
-from .worker import Log2Signal, logRTM
+from .worker import Log2Signal, rtm_relay
 
 __all__ = ["MainWindow", "default_style",
-           "Log2Signal", "logRTM"
+           "Log2Signal", "rtm_relay"
            ]
 
 if __name__ == "__main__": pass
