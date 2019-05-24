@@ -13,7 +13,7 @@ class RTMstreamer(MainWindow):
 
     startSig = pyqtSignal()
 
-    def dispatch(self, app):
+    def dispatch(self, app, verbose=False):
         # to quit
         app.aboutToQuit.connect(self.on_quit)
         # prepare
@@ -21,19 +21,36 @@ class RTMstreamer(MainWindow):
         self.stop_event = Event()
         config_worker = {
             'version': 1,
-            # 'disable_existing_loggers': True,
+            "formatters": {
+                "simple": {
+                    "format": "[%(levelname)s] %(message)s / %(name)s"
+                    },
+                },
             'handlers': {
                 'queue': {
                     'class': 'logging.handlers.QueueHandler',
                     'queue': self.q,
+                    },
+                "console": {
+                    "class": "logging.StreamHandler",
+                    "formatter": "simple",
+                    },
                 },
-            },
-            'root': {
-                'level': 'DEBUG',
-                'handlers': ['queue']
-            },
-
+            "loggers": {
+                'RTM': {
+                    'level': 'INFO',
+                    "propagate": verbose,
+                    'handlers': ["queue"],
+                    },
+                },
+           "root": None,
+##            "disable_existing_loggers" : False,
             }
+        if verbose:
+            config_worker["root"] = {
+               "level": "DEBUG",
+               "handlers": ["console"]
+                }
         # setup
         ## log to signal
         self.waiter = Log2Signal()
@@ -42,31 +59,33 @@ class RTMstreamer(MainWindow):
         listener = logging.handlers.QueueListener(self.q, self.waiter)
         listener.start()
         ## message to log
-        self.stream = Process(target=logRTM,
+        self.stream = Process(target=rtm_relay,
                               name="sc_RTM",
                               daemon=True,
                               args=(os.environ["SLACK_LEGACY_TOKEN"],
                                     self.stop_event,
                                     config_worker
                                     )
+                              # config=config_worker
                               )
         # start
         self.stream.start()
+        # need to be returned / app.exec_()
 
     def on_quit(self):
 ##        self.stream.disconnect()
         self.stop_event.set()
-        self.stream.join()
         self.stream.terminate()
+        self.stream.join()
 
     @classmethod
-    def go(cls, style=default_style):
+    def go(cls, verbose=False, style=default_style):
         app = QApplication(sys.argv)
         app.setStyleSheet(style)
         me = cls()
         me.show()
-        me.dispatch(app)
-        print("===\n\n")
+        me.dispatch(app, verbose)
+        logging.debug("===\n\n")
         sys.exit(app.exec_())
 
 

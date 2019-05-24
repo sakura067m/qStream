@@ -1,12 +1,14 @@
 import os
 import sys
 import time
+from multiprocessing import Process
 import logging
 import logging.config
-from slackclient import SlackClient
+from slack import RTMClient
 
 from PyQt5.QtCore import pyqtSignal, QObject
 
+rtmLogger = logging.getLogger("RTM")
 
 class Log2Signal(QObject):
 
@@ -15,30 +17,20 @@ class Log2Signal(QObject):
     def handle(self, record):
         self.new_message.emit(record.getMessage())
 
-def logRTM(token, stop_event, config):
+@RTMClient.run_on(event="message")
+def logRTM(**payload):
+    message = payload["data"]
+    if "subtype" in message: return
+    rtmLogger.info(message["text"])
+
+def rtm_relay(token, stop_event, config):
     logging.config.dictConfig(config)
-    levels = [logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR,
-              logging.CRITICAL]
-    logger = logging.getLogger("RTM")
-
+    rtmLogger.debug("start relay")
     # setup slack client
-    sc = SlackClient(token)
-
-    if sc.rtm_connect(auto_reconnect=True):
-        while not stop_event.is_set() and sc.server.connected is True:
-            rtm_response = sc.rtm_read()
-            for message in rtm_response:
-##                print(message)
-                if "subtype" in message: continue
-                message_type = message["type"]
-                if "message" == message_type:
-                    logger.info(message["text"])
-                else:
-                    pass
-            time.sleep(1)
-##        print("closing")
-    else:
-        print("Connection Failed")
+    sc = RTMClient(token=token)
+    sc.start()  # start async loop
 
 if __name__ == "__main__":
+    # slack_token = os.environ["SLACK_LEGACY_TOKEN"]
+    # rtm_client = RTMClient(token=slack_token)
     pass

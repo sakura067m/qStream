@@ -4,8 +4,9 @@ if "darwin" == platform.system().lower():
     # Mac needs certifi for ssl/https
     requirements = [
         "certifi",
-        "slackclient>=1.3.1",
+        "slackclient>=2.0.0",
         "PyQt5>=5.8.2",  # TBD
+        "qChatView@git+https://github.com/sakura067m/qChatView.git#egg=qChatView-1.0.0",
     ]
 else:
     requirements = [
@@ -15,7 +16,7 @@ else:
 
 setup(
     name="qStream",  # TBC
-    version="1.0.0",
+    version="1.1.0",
     description="show your stream. Slack version",
     url="https://github.com/sakura067m/qStream",
     author="sakura067m",
