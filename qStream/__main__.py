@@ -1,98 +1,65 @@
-from . import *
+from . import RTMstreamer
 import os
 import sys
 
-import logging.handlers
+def main():
+    if "SLACK_LEGACY_TOKEN" not in os.environ:
+        print("""\
+SLACK_LEGACY_TOKEN didn't found in os.environ.
+Please get the token and set it as SLACK_LEGACY_TOKEN.
+We will recommend;
+*** in your CLI
+SLACK_LEGACY_TOKEN=<your token here> python -m qStream
+***
+Also, you can set it by;
+*** in some setting file
+export SLACK_LEGACY_TOKEN=<your token here>
+***
 
-from multiprocessing import Process, Queue, Event
-
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import pyqtSignal
-
-class RTMstreamer(MainWindow):
-
-    startSig = pyqtSignal()
-
-    def dispatch(self, app, verbose=False):
-        # to quit
-        app.aboutToQuit.connect(self.on_quit)
-        # prepare
-        self.q = Queue()
-        self.stop_event = Event()
-        config_worker = {
-            'version': 1,
-            "formatters": {
-                "simple": {
-                    "format": "[%(levelname)s] %(message)s / %(name)s"
-                    },
-                },
-            'handlers': {
-                'queue': {
-                    'class': 'logging.handlers.QueueHandler',
-                    'queue': self.q,
-                    },
-                "console": {
-                    "class": "logging.StreamHandler",
-                    "formatter": "simple",
-                    },
-                },
-            "loggers": {
-                'RTM': {
-                    'level': 'INFO',
-                    "propagate": verbose,
-                    'handlers': ["queue"],
-                    },
-                },
-           "root": None,
-##            "disable_existing_loggers" : False,
-            }
-        if verbose:
-            config_worker["root"] = {
-               "level": "DEBUG",
-               "handlers": ["console"]
-                }
-        # setup
-        ## log to signal
-        self.waiter = Log2Signal()
-        self.waiter.new_message.connect(self.addChat1)
-        ## trigger
-        listener = logging.handlers.QueueListener(self.q, self.waiter)
-        listener.start()
-        ## message to log
-        self.stream = Process(target=rtm_relay,
-                              name="sc_RTM",
-                              daemon=True,
-                              args=(os.environ["SLACK_LEGACY_TOKEN"],
-                                    self.stop_event,
-                                    config_worker
-                                    )
-                              # config=config_worker
-                              )
-        # start
-        self.stream.start()
-        # need to be returned / app.exec_()
-
-    def on_quit(self):
-##        self.stream.disconnect()
-        self.stop_event.set()
-        self.stream.terminate()
-        self.stream.join()
-
-    @classmethod
-    def go(cls, verbose=False, style=default_style):
-        app = QApplication(sys.argv)
-        app.setStyleSheet(style)
-        me = cls()
-        me.show()
-        me.dispatch(app, verbose)
-        logging.debug("===\n\n")
-        sys.exit(app.exec_())
-
-
-
-if __name__ == "__main__":
-    print("poo")
+For the further information, see https://github.com/sakura067m/qStream
+"""
+        )
+        raise KeyError("SLACK_LEGACY_TOKEN")
     if "darwin" == sys.platform:
         import multiprocessing as mp
         mp.set_start_method("spawn")
-    RTMstreamer.go()
+    if 1 >= len(sys.argv):
+        RTMstreamer.go()
+    else:
+        import argparse
+        import fileinput
+        from io import StringIO
+
+        parser = argparse.ArgumentParser(
+            prog="python -m qStream",
+            description="Stream message from slack",
+            epilog="Homepage: https://github.com/sakura067m/qStream",
+            )
+        # parser.add_argument("-f", action="store_true")
+        parser.add_argument("-f", metavar="CSS", nargs="*",
+                            help="CSS for app's style sheet",
+                            )
+        parser.add_argument("-v", "--verbose", action="count",
+                            default=False,
+                            help="show messages in CLI too",
+                            )
+        args = parser.parse_args()
+
+        if None is args.f:
+            s = None
+        else:
+            buf = StringIO()
+            with fileinput.input(files=args.files) as f:
+                for l in f:
+                    buf.write(l)
+            s = buf.getvalue()
+            buf.close()
+
+        if s:
+            # start streaming with a css from input
+            RTMstreamer.go(verbose=args.verbose,style=s)
+        else:
+            RTMstreamer.go(verbose=args.vebose)
+
+if __name__ == "__main__":
+    main()
