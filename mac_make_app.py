@@ -63,7 +63,7 @@ with open(sh_dst, "w") as f:
         f.write("""\
 #!/bin/sh
 export SLACK_LEGACY_TOKEN={}
-qStream --css large)
+qStream --css large
 """.format(token))
 
 os.chmod(sh_dst,0o774)
