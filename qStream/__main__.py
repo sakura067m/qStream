@@ -36,7 +36,12 @@ For the further information, see https://github.com/sakura067m/qStream
             epilog="Homepage: https://github.com/sakura067m/qStream",
             )
         # parser.add_argument("-f", action="store_true")
-        parser.add_argument("-f", metavar="CSS", nargs="*",
+        css_group = parser.add_mutually_exclusive_group()
+        css_group.add_argument("--css", metavar="style",
+                               choices=["mini", "large"],
+                               help="use built-in style",
+                               )
+        css_group.add_argument("-f", metavar="CSS", nargs="*",
                             help="CSS for app's style sheet",
                             )
         parser.add_argument("-v", "--verbose", action="count",
@@ -45,7 +50,10 @@ For the further information, see https://github.com/sakura067m/qStream
                             )
         args = parser.parse_args()
 
-        if None is args.f:
+        if args.css:
+            from . import styles
+            s = getattr(styles,args.css)
+        elif None is args.f:
             s = None
         else:
             buf = StringIO()
@@ -59,7 +67,7 @@ For the further information, see https://github.com/sakura067m/qStream
             # start streaming with a css from input
             RTMstreamer.go(verbose=args.verbose,style=s)
         else:
-            RTMstreamer.go(verbose=args.vebose)
+            RTMstreamer.go(verbose=args.verbose)
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,5 @@
-from . import MainWindow, default_style, Log2Signal, rtm_relay
+from . import MainWindow, Log2Signal, rtm_relay
+from .styles import large as large_style
 import os
 import sys
 
@@ -79,7 +80,7 @@ class RTMstreamer(MainWindow):
         self.stream.join()
 
     @classmethod
-    def go(cls, verbose=False, style=default_style):
+    def go(cls, verbose=False, style=large_style):
         app = QApplication(sys.argv)
         app.setStyleSheet(style)
         me = cls()
