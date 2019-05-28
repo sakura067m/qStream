@@ -19,6 +19,15 @@ export SLACK_LEGACY_TOKEN=<your token here>
 For the further information, see https://github.com/sakura067m/qStream
 """
         )
+        from PyQt5.QtWodgets import QApplication, QMessageBox
+        app = QApplication(sys.argv)
+        QMessageBox.warning(None,
+                            "missing a token",
+                            "please set the token",
+                            QMessageBox.Yes,
+                            QMessageBox.Yes
+                            )
+
         raise KeyError("SLACK_LEGACY_TOKEN")
     if "darwin" == sys.platform:
         import multiprocessing as mp
