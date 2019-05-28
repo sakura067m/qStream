@@ -16,7 +16,7 @@ else:
 
 setup(
     name="qStream",  # TBC
-    version="1.1.0",
+    version="1.2.1",
     description="show your stream. Slack version",
     url="https://github.com/sakura067m/qStream",
     author="sakura067m",
@@ -28,7 +28,7 @@ setup(
         "qStream":[]
     },
     entry_points={
-        "gui_scripts": ["qStream = qStream.__main__:RTMStreamer.go"]
+        "gui_scripts": ["qStream = qStream.__main__:main"]
     },
     install_requires=requirements,
     python_requires='>=3.4',
