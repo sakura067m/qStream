@@ -45,7 +45,7 @@ class RTMstreamer(MainWindow):
                     },
                 },
            "root": None,
-##            "disable_existing_loggers" : False,
+            "disable_existing_loggers" : False,
             }
         if verbose>1:
             config_worker["root"] = {
