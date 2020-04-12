@@ -14,7 +14,7 @@ class RTMstreamer(MainWindow):
 
     startSig = pyqtSignal()
 
-    def dispatch(self, app, verbose=False):
+    def dispatch(self, app, verbose=False, extra_callback=()):
         # to quit
         app.aboutToQuit.connect(self.on_quit)
         # prepare
@@ -57,7 +57,10 @@ class RTMstreamer(MainWindow):
         self.waiter = Log2Signal()
         self.waiter.new_message.connect(self.addChat1)
         ## trigger
-        listener = logging.handlers.QueueListener(self.q, self.waiter)
+        listener = logging.handlers.QueueListener(self.q,
+                                                  self.waiter,
+                                                  *extra_callback
+                                                  )
         listener.start()
         ## message to log
         self.stream = Process(target=rtm_relay,
@@ -80,12 +83,12 @@ class RTMstreamer(MainWindow):
         self.stream.join()
 
     @classmethod
-    def go(cls, verbose=False, style=large_style):
+    def go(cls, verbose=False, style=large_style, extra_callback=()):
         app = QApplication(sys.argv)
         app.setStyleSheet(style)
         me = cls()
         me.show()
-        me.dispatch(app, verbose)
+        me.dispatch(app, verbose, extra_callback)
         logging.debug("===\n\n")
         sys.exit(app.exec_())
 
