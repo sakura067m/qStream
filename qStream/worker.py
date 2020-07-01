@@ -1,7 +1,3 @@
-import os
-import sys
-import time
-from multiprocessing import Process
 import logging
 import logging.config
 from slack import RTMClient
